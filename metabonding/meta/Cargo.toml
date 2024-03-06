@@ -1,0 +1,15 @@
+[package]
+name = "metabonding-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = ["Dorin Marian Iancu, dorin.iancu@dharitri.com"]
+
+[dev-dependencies]
+
+[dependencies.metabonding]
+path = ".."
+
+[dependencies.dharitri-sc-meta]
+version = "=0.13.6"
+default-features = false
