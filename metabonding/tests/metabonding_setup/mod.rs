@@ -57,14 +57,14 @@ where
         let first_project_owner = b_mock.create_user_account(&rust_zero);
         let second_project_owner = b_mock.create_user_account(&rust_zero);
 
-        // need to create some fixed addresses to reuse the signatures from denali
-        // address:user1 from denali
+        // need to create some fixed addresses to reuse the signatures from mandos
+        // address:user1 from mandos
         let first_user_addr = Address::from(hex_literal::hex!(
             "75736572315F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F"
         ));
         b_mock.create_user_account_fixed_address(&first_user_addr, &rust_zero);
 
-        // address:user2 from denali
+        // address:user2 from mandos
         let second_user_addr = Address::from(hex_literal::hex!(
             "75736572325F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F5F"
         ));
