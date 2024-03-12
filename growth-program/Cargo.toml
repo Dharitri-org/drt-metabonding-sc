@@ -1,0 +1,62 @@
+[package]
+name = "growth-program"
+version = "0.0.0"
+authors = ["you"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies.dharitri-sc]
+version = "=0.13.6"
+features = ["dct-token-payment-legacy-decode"]
+
+[dependencies.dharitri-sc-modules]
+version = "=0.13.6"
+
+[dependencies.utils]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dependencies.router]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dependencies.pair]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dependencies.week-timekeeping]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dependencies.energy-query]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dependencies.simple-lock]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"
+
+[dev-dependencies]
+num-bigint = "0.4.2"
+num-traits = "0.2"
+hex = "0.4"
+hex-literal = "0.4.1"
+
+[dev-dependencies.dharitri-sc-scenario]
+version = "=0.13.6"
+
+[dev-dependencies.dharitri-sc-modules]
+version = "=0.13.6"
+
+[dev-dependencies.pair-mock]
+path = "../pair-mock"
+
+[dev-dependencies.router-mock]
+path = "../router-mock"
+
+[dependencies.energy-factory]
+git = "https://github.com/Dharitri-org/drt-exchange-sc"
+rev = "b66c644"

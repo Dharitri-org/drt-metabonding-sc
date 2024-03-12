@@ -1,4 +1,4 @@
-WALLET_PEM="/home/dharitri/dharitrisdk/moapy-venv/lib/python3.8/site-packages/moapy/testnet/wallets/users/mike.pem"
+WALLET_PEM="/home/dharitri/dharitri-sdk/mxpy-venv/lib/python3.8/site-packages/mxpy/testnet/wallets/users/mike.pem"
 PROXY="https://devnet-gateway.dharitri.com"
 CHAIN_ID="D"
 
@@ -9,7 +9,7 @@ CONTRACT_ADDRESS="moa1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqhsx6tv
 
 SIGNER_PUB_KEY=0x52773868c13654355cca16adb389b09201fabf5d9d4b795ebbdae5b361b46f20
 deployMetabondingSC() {
-    moapy --verbose contract deploy --recall-nonce \
+    mxpy --verbose contract deploy --recall-nonce \
         --bytecode=${METABONDING_WASM_PATH} \
         --pem=${WALLET_PEM} \
         --gas-limit=200000000 \
@@ -19,7 +19,7 @@ deployMetabondingSC() {
 }
 
 upgradeMetabondingSC() {
-    moapy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract upgrade ${CONTRACT_ADDRESS} --recall-nonce \
         --bytecode=${METABONDING_WASM_PATH} \
         --pem=${WALLET_PEM} \
         --gas-limit=200000000 \
@@ -32,7 +32,7 @@ TOKEN=0x4d5442
 TOKEN_AMOUNT=0xfffffffffffffffffffffffffffffffffffff
 TOKEN_DECIMALS=18
 issueToken() {
-    moapy --verbose contract call ${DCT_ISSUE_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${DCT_ISSUE_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=60000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -43,7 +43,7 @@ issueToken() {
 }
 
 unpause() {
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -52,7 +52,7 @@ unpause() {
 }
 
 changeSigner() {
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -70,8 +70,8 @@ START_WEEK=2
 DURATION_WEEK=10
 LKMEX_REWARDS_PERCENTAGE=40
 addProject() {
-    project_owner="0x$(moapy wallet bech32 --decode ${PROJECT_OWNER})"
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    project_owner="0x$(mxpy wallet bech32 --decode ${PROJECT_OWNER})"
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -84,8 +84,8 @@ addProject() {
 #1 - ProjectId
 DEPOSIT_METHOD=0x6465706f73697452657761726473 #depositRewards 
 depositRewards() {
-    contract_address="0x$(moapy wallet bech32 --decode ${CONTRACT_ADDRESS})"
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    contract_address="0x$(mxpy wallet bech32 --decode ${CONTRACT_ADDRESS})"
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -99,8 +99,8 @@ depositRewards() {
 #2 - Total delegation amount
 #3 - Total lkmex staked
 addRewardsCheckpoint() {
-    contract_address="0x$(moapy wallet bech32 --decode ${CONTRACT_ADDRESS})"
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    contract_address="0x$(mxpy wallet bech32 --decode ${CONTRACT_ADDRESS})"
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -116,7 +116,7 @@ addRewardsCheckpoint() {
 #4 - Signature
 # Signature Example -> 0xaf32d5d139e8616b109510ff5b78d8f6a0409ab98bca99e1cb2437d917a6b62b6b4217b136df23377d715c638eb1e6709d90edf6955c29823e93fc525dad9405
 claimRewards() {
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -128,7 +128,7 @@ claimRewards() {
 ###PARAMS
 #1 - ProjectId
 removeProject() {
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -138,7 +138,7 @@ removeProject() {
 }
 
 clearExpiredProjects() {
-    moapy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
+    mxpy --verbose contract call ${CONTRACT_ADDRESS} --recall-nonce \
         --pem=${WALLET_PEM} \
         --gas-limit=6000000 \
         --proxy=${PROXY} --chain=${CHAIN_ID} \
@@ -147,7 +147,7 @@ clearExpiredProjects() {
 }
 
 getCurrentWeek() {
-    moapy --verbose contract query ${CONTRACT_ADDRESS} \
+    mxpy --verbose contract query ${CONTRACT_ADDRESS} \
         --proxy=${PROXY} \
         --function="getCurrentWeek"
 }
@@ -155,14 +155,14 @@ getCurrentWeek() {
 ###PARAMS
 #1 - ProjectId
 getProjectById() {
-    moapy --verbose contract query ${CONTRACT_ADDRESS} \
+    mxpy --verbose contract query ${CONTRACT_ADDRESS} \
         --proxy=${PROXY} \
         --function="getProjectById" \
         --arguments $1
 }
 
 getAllProjectIds() {
-    moapy --verbose contract query ${CONTRACT_ADDRESS} \
+    mxpy --verbose contract query ${CONTRACT_ADDRESS} \
         --proxy=${PROXY} \
         --function="getAllProjectIds"
 }
@@ -172,7 +172,7 @@ getAllProjectIds() {
 #2 - User delegation amount
 #3 - User lkmex staked
 getRewardsForWeek() {
-    moapy --verbose contract query ${CONTRACT_ADDRESS} \
+    mxpy --verbose contract query ${CONTRACT_ADDRESS} \
         --proxy=${PROXY} \
         --function="getRewardsForWeek" \
         --arguments $1 $2 $3
@@ -182,8 +182,8 @@ getRewardsForWeek() {
 #1 - Lookback weeks no
 CHECK_USER_ADDRESS="moa14nw9pukqyqu75gj0shm8upsegjft8l0awjefp877phfx74775dsqcakpap"
 getUserClaimableWeeks() {
-    check_user_address="0x$(moapy wallet bech32 --decode ${CHECK_USER_ADDRESS})"
-    moapy --verbose contract query ${CONTRACT_ADDRESS} \
+    check_user_address="0x$(mxpy wallet bech32 --decode ${CHECK_USER_ADDRESS})"
+    mxpy --verbose contract query ${CONTRACT_ADDRESS} \
         --proxy=${PROXY} \
         --function="getUserClaimableWeeks" \
         --arguments $check_user_address ${LOOKBACK_WEEK_NO}

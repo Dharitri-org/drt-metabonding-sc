@@ -1,18 +1,19 @@
-dharitri_wasm::imports!();
-dharitri_wasm::derive_imports!();
+dharitri_sc::imports!();
+dharitri_sc::derive_imports!();
 
 use crate::{
     common_storage::{EPOCHS_IN_WEEK, MAX_PERCENTAGE},
-    rewards::Week,
+    rewards::{Week, FIRST_WEEK},
 };
 use core::convert::TryInto;
 
 pub const PROJECT_EXPIRATION_WEEKS: Week = 4;
 const MAX_PROJECT_ID_LEN: usize = 10;
 const MIN_GAS_FOR_CLEAR: u64 = 5_000_000;
-const INVALID_PROJECT_ID_ERR_MSG: &[u8] = b"Invalid project ID";
+static INVALID_PROJECT_ID_ERR_MSG: &[u8] = b"Invalid project ID";
 
 pub type ProjectId<M> = ManagedBuffer<M>;
+pub type ProjIdsVec<M> = ManagedVec<M, ProjectId<M>>;
 pub type ProjectAsMultiResult<M> =
     MultiValue5<TokenIdentifier<M>, BigUint<M>, BigUint<M>, Week, Week>;
 pub type Epoch = u64;
@@ -49,7 +50,7 @@ impl<M: ManagedTypeApi> Project<M> {
     }
 }
 
-#[dharitri_wasm::module]
+#[dharitri_sc::module]
 pub trait ProjectModule: crate::common_storage::CommonStorageModule {
     /// Adds a new project. Arguments:
     /// - project_id: a unique ID of maximum 10 bytes
@@ -77,7 +78,10 @@ pub trait ProjectModule: crate::common_storage::CommonStorageModule {
             "Invalid reward token"
         );
         require!(reward_supply > 0, "Reward supply cannot be 0");
-        require!(duration_weeks > 0, "Invalid duration");
+        require!(
+            start_week >= FIRST_WEEK && duration_weeks > 0,
+            "Invalid duration"
+        );
 
         require!(
             lkmex_rewards_percentage <= MAX_PERCENTAGE,
@@ -156,8 +160,8 @@ pub trait ProjectModule: crate::common_storage::CommonStorageModule {
         project_id: &ProjectId<Self::Api>,
         token_id: &TokenIdentifier,
     ) {
-        let project_owner = self.get_and_clear(&self.project_owner(project_id));
-        let leftover_funds = self.get_and_clear(&self.leftover_project_funds(project_id));
+        let project_owner = self.project_owner(project_id).take();
+        let leftover_funds = self.leftover_project_funds(project_id).take();
 
         let _ = self.projects().remove(project_id);
 
@@ -168,13 +172,17 @@ pub trait ProjectModule: crate::common_storage::CommonStorageModule {
     }
 
     #[view(getAllProjectIds)]
-    fn get_all_project_ids(&self) -> MultiValueEncoded<ProjectId<Self::Api>> {
+    fn get_all_project_ids_view(&self) -> MultiValueEncoded<ProjectId<Self::Api>> {
+        self.get_all_project_ids().into()
+    }
+
+    fn get_all_project_ids(&self) -> ProjIdsVec<Self::Api> {
         let mut all_ids = ManagedVec::new();
         for id in self.projects().keys() {
             all_ids.push(id);
         }
 
-        all_ids.into()
+        all_ids
     }
 
     /// Returns a project by ID. The results are, in order:
