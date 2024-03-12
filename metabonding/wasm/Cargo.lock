@@ -23,9 +23,9 @@ checksum = "327762f6e5a765692301e5bb513e0d9fef63be86bbc14528052b1cd3e6f03e07"
 [[package]]
 name = "common_errors"
 version = "0.0.0"
-source = "git+https://github.com/multiversx/mx-exchange-sc?rev=0c7f45e#0c7f45e74d9b39ccdf27588ed6bf0a19dbc501cd"
+source = "git+https://github.com/Dharitri-org/drt-exchange-sc?rev=b66c644#b66c6447ba174bc170ac5b50253da8353b8b9363"
 dependencies = [
- "multiversx-sc",
+ "dharitri-sc",
 ]
 
 [[package]]
@@ -50,8 +50,8 @@ checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 name = "metabonding"
 version = "0.0.0"
 dependencies = [
- "multiversx-sc",
- "multiversx-sc-modules",
+ "dharitri-sc",
+ "dharitri-sc-modules",
  "sc_whitelist_module",
 ]
 
@@ -60,35 +60,35 @@ name = "metabonding-wasm"
 version = "0.0.0"
 dependencies = [
  "metabonding",
- "multiversx-sc-wasm-adapter",
+ "dharitri-sc-wasm-adapter",
 ]
 
 [[package]]
-name = "multiversx-sc"
-version = "0.46.1"
+name = "dharitri-sc"
+version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c94b173dc5ff0e157f767275fe6b7a1b4d2ad343bef7b66cd22a6353e016b93"
 dependencies = [
  "bitflags",
  "hex-literal",
- "multiversx-sc-codec",
- "multiversx-sc-derive",
+ "dharitri-sc-codec",
+ "dharitri-sc-derive",
  "num-traits",
 ]
 
 [[package]]
-name = "multiversx-sc-codec"
-version = "0.18.3"
+name = "dharitri-sc-codec"
+version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19908153158c03df4582af08f47c0eb39fb52a7dff4736b301a66acbbb9955d3"
 dependencies = [
  "arrayvec",
- "multiversx-sc-codec-derive",
+ "dharitri-sc-codec-derive",
 ]
 
 [[package]]
-name = "multiversx-sc-codec-derive"
-version = "0.18.3"
+name = "dharitri-sc-codec-derive"
+version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d3b03b43f9cad320992f54ed162de2ed63e3ec83ed01361e57ee9c1865fba5a2"
 dependencies = [
@@ -99,8 +99,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-sc-derive"
-version = "0.46.1"
+name = "dharitri-sc-derive"
+version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3b78945957036c281ad6ee21bb5120dcefa2017688adf43ec94e3e7c982efb09"
 dependencies = [
@@ -112,21 +112,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "multiversx-sc-modules"
-version = "0.46.1"
+name = "dharitri-sc-modules"
+version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c63ffaba95e630ff75981e2f5f50da64f523219b52f484234c66f3adc248885f"
 dependencies = [
- "multiversx-sc",
+ "dharitri-sc",
 ]
 
 [[package]]
-name = "multiversx-sc-wasm-adapter"
-version = "0.46.1"
+name = "dharitri-sc-wasm-adapter"
+version = "0.13.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9579f40c00da56a5a68e010ff851fa48ac7b9c6a16ad4314795cb32d889d9e78"
 dependencies = [
- "multiversx-sc",
+ "dharitri-sc",
 ]
 
 [[package]]
@@ -178,10 +178,10 @@ dependencies = [
 [[package]]
 name = "sc_whitelist_module"
 version = "0.0.0"
-source = "git+https://github.com/multiversx/mx-exchange-sc?rev=0c7f45e#0c7f45e74d9b39ccdf27588ed6bf0a19dbc501cd"
+source = "git+https://github.com/Dharitri-org/drt-exchange-sc?rev=b66c644#b66c6447ba174bc170ac5b50253da8353b8b9363"
 dependencies = [
  "common_errors",
- "multiversx-sc",
+ "dharitri-sc",
 ]
 
 [[package]]

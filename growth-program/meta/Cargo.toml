@@ -1,0 +1,12 @@
+[package]
+name = "growth-program-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.growth-program]
+path = ".."
+
+[dependencies.dharitri-sc-meta]
+version = "=0.13.6"
+default-features = false
