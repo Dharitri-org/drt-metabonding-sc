@@ -1,36 +1,21 @@
-dharitri_sc::imports!();
-dharitri_sc::derive_imports!();
+dharitri_wasm::imports!();
+dharitri_wasm::derive_imports!();
 
-use crate::{
-    claim::ClaimArgsWrapper,
-    project::{Project, ProjectId},
-    validation::Signature,
-};
+use crate::project::{Project, ProjectId, PROJECT_EXPIRATION_WEEKS};
 
 pub type Week = usize;
 pub type PrettyRewards<M> =
     MultiValueEncoded<M, MultiValue3<ProjectId<M>, TokenIdentifier<M>, BigUint<M>>>;
 
-pub const FIRST_WEEK: usize = 1;
-
-#[derive(TypeAbi, TopEncode, TopDecode, Clone)]
+#[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct RewardsCheckpoint<M: ManagedTypeApi> {
     pub total_delegation_supply: BigUint<M>,
     pub total_lkmex_staked: BigUint<M>,
 }
 
-impl<M: ManagedTypeApi> Default for RewardsCheckpoint<M> {
-    fn default() -> Self {
-        Self {
-            total_delegation_supply: BigUint::zero(),
-            total_lkmex_staked: BigUint::zero(),
-        }
-    }
-}
-
-#[dharitri_sc::module]
+#[dharitri_wasm::module]
 pub trait RewardsModule:
-    dharitri_sc_modules::pause::PauseModule
+    dharitri_wasm_modules::pause::PauseModule
     + crate::project::ProjectModule
     + crate::access_control::AccessControlModule
     + crate::common_storage::CommonStorageModule
@@ -113,20 +98,21 @@ pub trait RewardsModule:
         user_delegation_amount: BigUint,
         user_lkmex_staked_amount: BigUint,
     ) -> PrettyRewards<Self::Api> {
-        let checkpoint = self.rewards_checkpoints().get(week);
+        let checkpoint: RewardsCheckpoint<Self::Api> = self.rewards_checkpoints().get(week);
         let current_week = self.get_current_week();
-        let claim_arg = ClaimArgsWrapper {
-            week,
-            user_delegation_amount,
-            user_lkmex_staked_amount,
-            checkpoint,
-            signature: Signature::default(),
-        };
-
         let mut rewards_pretty = MultiValueEncoded::new();
+
         for (id, project) in self.projects().iter() {
-            let opt_weekly_reward =
-                self.get_weekly_reward_for_project(&id, &project, current_week, &claim_arg);
+            let opt_weekly_reward = self.get_weekly_reward_for_project(
+                &id,
+                &project,
+                current_week,
+                week,
+                &user_delegation_amount,
+                &user_lkmex_staked_amount,
+                &checkpoint.total_delegation_supply,
+                &checkpoint.total_lkmex_staked,
+            );
 
             if let Some(weekly_reward) = opt_weekly_reward {
                 rewards_pretty.push((id, project.reward_token, weekly_reward).into());
@@ -141,19 +127,26 @@ pub trait RewardsModule:
         project_id: &ProjectId<Self::Api>,
         project: &Project<Self::Api>,
         current_week: Week,
-        claim_arg: &ClaimArgsWrapper<Self::Api>,
+        week: Week,
+        user_delegation_amount: &BigUint,
+        user_lkmex_staked_amount: &BigUint,
+        total_delegation_supply: &BigUint,
+        total_lkmex_staked: &BigUint,
     ) -> Option<BigUint> {
-        if !self.is_in_range(claim_arg.week, project.start_week, project.end_week) {
-            return None;
-        }
-        if !self.rewards_deposited(project_id).get() {
-            return None;
-        }
-        if project.is_expired(current_week) {
+        if !self.is_in_range(week, project.start_week, project.end_week)
+            || !self.rewards_deposited(project_id).get()
+            || project.is_expired(current_week)
+        {
             return None;
         }
 
-        let reward_amount = self.calculate_reward_amount(project, claim_arg);
+        let reward_amount = self.calculate_reward_amount(
+            project,
+            user_delegation_amount,
+            user_lkmex_staked_amount,
+            total_delegation_supply,
+            total_lkmex_staked,
+        );
         if reward_amount > 0 {
             Some(reward_amount)
         } else {
@@ -164,7 +157,10 @@ pub trait RewardsModule:
     fn calculate_reward_amount(
         &self,
         project: &Project<Self::Api>,
-        claim_arg: &ClaimArgsWrapper<Self::Api>,
+        user_delegation_amount: &BigUint,
+        user_lkmex_staked_amount: &BigUint,
+        total_delegation_supply: &BigUint,
+        total_lkmex_staked: &BigUint,
     ) -> BigUint {
         let project_duration_weeks = project.get_duration_in_weeks() as u32;
         let rewards_supply_per_week_delegation =
@@ -173,16 +169,26 @@ pub trait RewardsModule:
 
         let rewards_delegation = self.calculate_ratio(
             &rewards_supply_per_week_delegation,
-            &claim_arg.user_delegation_amount,
-            &claim_arg.checkpoint.total_delegation_supply,
+            user_delegation_amount,
+            total_delegation_supply,
         );
         let rewards_lkmex = self.calculate_ratio(
             &rewards_supply_per_week_lkmex,
-            &claim_arg.user_lkmex_staked_amount,
-            &claim_arg.checkpoint.total_lkmex_staked,
+            user_lkmex_staked_amount,
+            total_lkmex_staked,
         );
 
         rewards_delegation + rewards_lkmex
+    }
+
+    fn is_claim_in_time(
+        &self,
+        claim_week: Week,
+        current_week: Week,
+        rewards_nr_first_grace_weeks: Week,
+    ) -> bool {
+        current_week <= rewards_nr_first_grace_weeks
+            || current_week <= claim_week + PROJECT_EXPIRATION_WEEKS
     }
 
     #[inline]
