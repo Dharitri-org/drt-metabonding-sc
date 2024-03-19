@@ -1,28 +1,24 @@
 [package]
 name = "metabonding"
 version = "0.0.0"
-authors = ["Dorin Marian Iancu, dorin.iancu@dharitri.com"]
+authors = [ "Dorin Marian Iancu, dorin.iancu@dharitri.com" ]
 edition = "2018"
 publish = false
 
 [lib]
 path = "src/lib.rs"
 
-[dependencies.dharitri-sc]
-version = "=0.13.6"
+[dependencies.dharitri-wasm]
+version = "=0.10.6"
 
-[dependencies.dharitri-sc-modules]
-version = "=0.13.6"
+[dependencies.dharitri-wasm-modules]
+version = "=0.10.6"
 
-[dependencies.sc_whitelist_module]
-git = "https://github.com/Dharitri-org/drt-exchange-sc"
-rev = "b66c644"
+[dev-dependencies.dharitri-wasm-debug]
+version = "=0.10.6"
 
 [dev-dependencies]
 num-bigint = "0.4.2"
 num-traits = "0.2"
 hex = "0.4"
-hex-literal = "0.4.1"
-
-[dev-dependencies.dharitri-sc-scenario]
-version = "=0.13.6"
+hex-literal = "0.3.4"
