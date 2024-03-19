@@ -13,10 +13,9 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: DharitriNetwork/dharitri-actions/.github/workflows/contracts.yml@v1
+    uses: dharitri/mx-sc-actions/.github/workflows/contracts.yml@v2.3.5
     with:
-      rust-toolchain: nightly-2022-10-16
-      vmtools-version: v1.4.60
-      extra-build-args: --ignore-eei-checks
+      rust-toolchain: nightly-2023-12-11
+      vmtools-version: v1.5.24
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
