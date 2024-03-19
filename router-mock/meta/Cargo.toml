@@ -1,0 +1,12 @@
+[package]
+name = "router-mock-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.router-mock]
+path = ".."
+
+[dependencies.dharitri-sc-meta]
+version = "=0.13.6"
+default-features = false

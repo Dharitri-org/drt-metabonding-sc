@@ -1,8 +1,8 @@
-dharitri_wasm::imports!();
+dharitri_sc::imports!();
 
 use crate::rewards::Week;
 
-#[dharitri_wasm::module]
+#[dharitri_sc::module]
 pub trait MathModule {
     fn calculate_ratio(&self, amount: &BigUint, part: &BigUint, total: &BigUint) -> BigUint {
         if total == &0 {

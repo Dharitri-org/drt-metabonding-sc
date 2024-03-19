@@ -1,6 +1,6 @@
-dharitri_wasm::imports!();
+dharitri_sc::imports!();
 
-#[dharitri_wasm::module]
+#[dharitri_sc::module]
 pub trait AccessControlModule: crate::common_storage::CommonStorageModule {
     fn require_caller_owner_or_signer(&self) {
         let caller = self.blockchain().get_caller();

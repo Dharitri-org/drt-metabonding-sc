@@ -1,21 +1,24 @@
-use dharitri_wasm::{
-    api::ED25519_SIGNATURE_BYTE_LEN,
-    dharitri_codec::multi_types::OptionalValue,
-    types::{Address, MultiValueEncoded},
-};
-use dharitri_wasm_debug::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
-    testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
-    tx_mock::TxResult,
-    DebugApi,
-};
-use dharitri_wasm_modules::pause::PauseModule;
+#![allow(deprecated)]
+
 use metabonding::rewards::RewardsModule;
 use metabonding::*;
 use metabonding::{claim::ClaimModule, project::ProjectModule};
 use metabonding::{
     common_storage::{CommonStorageModule, EPOCHS_IN_WEEK},
     rewards::Week,
+};
+use dharitri_sc::types::ManagedVec;
+use dharitri_sc::{
+    api::ED25519_SIGNATURE_BYTE_LEN,
+    codec::multi_types::OptionalValue,
+    types::{Address, MultiValueEncoded},
+};
+use dharitri_sc_modules::pause::PauseModule;
+use dharitri_sc_scenario::testing_framework::{
+    BlockchainStateWrapper, ContractObjWrapper, TxResult,
+};
+use dharitri_sc_scenario::{
+    managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint, DebugApi,
 };
 
 // associated private key - used for generating the signatures (please don't steal my funds)
@@ -69,7 +72,7 @@ where
 
         b_mock.set_dct_balance(
             &first_project_owner,
-            &FIRST_PROJ_TOKEN,
+            FIRST_PROJ_TOKEN,
             &rust_biguint!(TOTAL_FIRST_PROJ_TOKENS),
         );
         b_mock.set_dct_balance(
@@ -90,15 +93,11 @@ where
         b_mock
             .execute_tx(&owner_addr, &mb_wrapper, &rust_zero, |sc| {
                 let signer_addr = managed_address!(&Address::from(&SIGNER_ADDRESS));
-                sc.init(
-                    signer_addr.clone(),
-                    OptionalValue::None,
-                    OptionalValue::None,
-                );
+                sc.init(signer_addr.clone(), OptionalValue::None);
 
                 assert_eq!(sc.first_week_start_epoch().get(), 5);
                 assert_eq!(sc.signer().get(), signer_addr);
-                assert_eq!(sc.is_paused(), true);
+                assert!(sc.is_paused());
             })
             .assert_ok();
 
@@ -204,6 +203,7 @@ where
         )
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn call_add_project(
         &mut self,
         project_id: &[u8],
@@ -259,7 +259,7 @@ where
 
         self.b_mock
             .execute_query(&self.mb_wrapper, |sc| {
-                let result = sc.get_all_project_ids();
+                let result = sc.get_all_project_ids_view();
 
                 for id in &result.to_vec() {
                     all_ids.push(id.to_boxed_bytes().as_slice().to_vec());
@@ -358,7 +358,38 @@ where
                         .into(),
                 );
 
-                sc.claim_rewards(args);
+                let _ = sc.claim_rewards(managed_address!(caller), args);
+            })
+    }
+
+    pub fn call_claim_partial_rewards(
+        &mut self,
+        caller: &Address,
+        week: Week,
+        user_delegation_supply: u64,
+        user_lkmex_staked: u64,
+        signature: &[u8; ED25519_SIGNATURE_BYTE_LEN],
+        projects_to_claim: &[&[u8]],
+    ) -> TxResult {
+        self.b_mock
+            .execute_tx(caller, &self.mb_wrapper, &rust_biguint!(0), |sc| {
+                let mut args = MultiValueEncoded::new();
+                args.push(
+                    (
+                        week,
+                        managed_biguint!(user_delegation_supply),
+                        managed_biguint!(user_lkmex_staked),
+                        signature.into(),
+                    )
+                        .into(),
+                );
+
+                let mut ptc = ManagedVec::new();
+                for proj_id in projects_to_claim {
+                    ptc.push(managed_buffer!(*proj_id));
+                }
+
+                let _ = sc.claim_partial_rewards(managed_address!(caller), ptc, args);
             })
     }
 
@@ -384,7 +415,7 @@ where
                     );
                 }
 
-                sc.claim_rewards(encoded_args);
+                let _ = sc.claim_rewards(managed_address!(caller), encoded_args);
             })
     }
 
@@ -395,7 +426,8 @@ where
             .execute_query(&self.mb_wrapper, |sc| {
                 let result = sc.get_user_claimable_weeks(managed_address!(user_addr));
 
-                for week in &result.to_vec() {
+                for multi_value in result {
+                    let (week, _) = multi_value.into_tuple();
                     weeks.push(week);
                 }
             })
