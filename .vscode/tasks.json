@@ -1,0 +1,14 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Dump env",
+            "command": "node",
+            "args": ["-e", "console.log(JSON.stringify(process.env, null, 4))"],
+            "type": "process",
+            "options": {
+                "env": {"PATH":"${env:HOME}/dharitrisdk/vendor-rust/bin:${env:HOME}/dharitrisdk/moapy-venv/bin:${env:HOME}/dharitrisdk/vmtools:${env:HOME}/dharitrisdk/nodejs/latest/bin:${env:PATH}","VIRTUAL_ENV":"${env:HOME}/dharitrisdk/moapy-venv","RUSTUP_HOME":"${env:HOME}/dharitrisdk/vendor-rust","CARGO_HOME":"${env:HOME}/dharitrisdk/vendor-rust"}
+            }
+        }
+    ]
+}
